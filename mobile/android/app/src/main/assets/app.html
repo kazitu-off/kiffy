@@ -354,6 +354,88 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
 .person .pinfo { flex: 1; min-width: 0; }
 .person .pname { font-weight: 500; font-size: 13px; display: flex; align-items: center; gap: 4px; }
 .person .psub { font-size: 11.5px; color: var(--on-surface-variant); }
+
+/* ================= REAL PRIVATE MESSAGING (НАСТОЯЩИЙ ЛС) ================= */
+.chat-tabs-bar {
+  display: flex; align-items: center; gap: 6px; padding: 6px 12px;
+  background: var(--surface-c-low); border-bottom: 1px solid var(--outline-v);
+  overflow-x: auto; scrollbar-width: none; flex: none; -webkit-overflow-scrolling: touch;
+}
+.chat-tabs-bar::-webkit-scrollbar { display: none; }
+.chat-tab {
+  display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px;
+  border-radius: 12px; font-size: 12.5px; font-weight: 500; cursor: pointer;
+  background: var(--surface-c); color: var(--on-surface-variant);
+  white-space: nowrap; transition: all var(--md-sys-motion); flex: none; border: 1px solid transparent;
+}
+.chat-tab:hover { background: var(--surface-c-high); color: var(--on-surface); }
+.chat-tab.active {
+  background: var(--primary-container); color: var(--on-primary-container);
+  border-color: var(--outline-v); font-weight: 600;
+}
+.chat-tab .tab-unread {
+  background: var(--error); color: #FFFFFF; font-size: 10px;
+  padding: 1px 6px; border-radius: 999px; font-weight: 700; min-width: 16px; text-align: center;
+}
+.chat-tab .tab-close {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 16px; height: 16px; border-radius: 50%; opacity: .6; margin-left: 2px;
+}
+.chat-tab .tab-close:hover { opacity: 1; background: rgba(0,0,0,.15); }
+
+/* Dedicated PM Header */
+.pm-header-bar {
+  display: flex; align-items: center; gap: 10px; padding: 8px 12px;
+  background: var(--surface-c-low); border-bottom: 1px solid var(--outline-v); flex: none;
+}
+.pm-back-btn {
+  width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;
+  border-radius: 50%; cursor: pointer; color: var(--on-surface); flex: none;
+}
+.pm-back-btn:hover { background: var(--surface-c); }
+.pm-header-info { flex: 1; min-width: 0; }
+.pm-header-name { font-weight: 600; font-size: 14px; display: flex; align-items: center; gap: 6px; }
+.pm-header-status { font-size: 11.5px; color: var(--on-surface-variant); display: flex; align-items: center; gap: 5px; }
+.pm-online-dot { width: 7px; height: 7px; border-radius: 50%; background: #4CAF50; display: inline-block; }
+.pm-online-dot.offline { background: var(--outline); }
+
+/* PM Intro Card */
+.pm-intro-card {
+  display: flex; flex-direction: column; align-items: center; text-align: center;
+  padding: 22px 18px; margin: 16px auto; max-width: 360px;
+  background: var(--surface-c-low); border: 1px solid var(--outline-v);
+  border-radius: 20px; color: var(--on-surface-variant);
+}
+.pm-intro-card .avatar { margin-bottom: 10px; font-size: 22px; width: 52px; height: 52px; }
+.pm-intro-title { font-size: 16px; font-weight: 600; color: var(--on-surface); margin-bottom: 4px; }
+.pm-intro-text { font-size: 12px; line-height: 1.45; }
+
+/* Floating PM Notification Banner */
+.pm-notif-toast {
+  position: fixed; top: 12px; left: 50%; transform: translateX(-50%) translateY(-20px);
+  width: min(92vw, 420px); background: var(--surface-c-highest); color: var(--on-surface);
+  border: 1px solid var(--outline); border-radius: 16px; padding: 10px 14px;
+  box-shadow: 0 8px 28px var(--shadow); display: flex; align-items: center; gap: 10px;
+  z-index: 999; opacity: 0; pointer-events: none; transition: all var(--md-sys-motion);
+}
+.pm-notif-toast.show {
+  opacity: 1; pointer-events: auto; transform: translateX(-50%) translateY(0);
+}
+.pm-notif-body { flex: 1; min-width: 0; }
+.pm-notif-author { font-size: 12.5px; font-weight: 600; display: flex; align-items: center; gap: 5px; }
+.pm-notif-snippet { font-size: 11.5px; color: var(--on-surface-variant); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* PM Badges */
+.pm-badge-chip {
+  font-size: 10px; font-weight: 600; padding: 1px 6px; border-radius: 6px;
+  background: var(--secondary-container); color: var(--on-secondary-container);
+  display: inline-block; margin-right: 4px; vertical-align: middle;
+}
+.msg.pm .bubble {
+  border-left: 3px solid var(--primary);
+}
+.msg-clickable { cursor: pointer; }
+.msg-clickable:hover { text-decoration: underline; }
 </style>
 </head>
 <body data-view="chat" data-theme="dark" data-palette="sage">
@@ -407,10 +489,29 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
 
     <!-- 1. CHAT VIEW -->
     <section id="viewChat" class="view">
+      <!-- Dedicated PM Header (Active when inside a PM thread) -->
+      <div class="pm-header-bar hidden" id="pmHeaderBar">
+        <button class="pm-back-btn" id="btnPmBack" title="Назад в общий чат">
+          <svg class="ic" viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+        </button>
+        <div id="pmHeaderAvatar"></div>
+        <div class="pm-header-info">
+          <div class="pm-header-name" id="pmHeaderName">Alice</div>
+          <div class="pm-header-status" id="pmHeaderStatus">
+            <span class="pm-online-dot" id="pmHeaderDot"></span>
+            <span id="pmHeaderSub">Личные сообщения</span>
+          </div>
+        </div>
+        <button class="btn text" id="btnPmCloseThread" style="font-size:12px;padding:4px 8px" title="Закрыть диалог">Закрыть</button>
+      </div>
+
+      <!-- Horizontal Dialog Switcher Bar (# Общий чат, Alice, Bob) -->
+      <div class="chat-tabs-bar hidden" id="chatTabsBar"></div>
+
       <div class="empty" id="emptyState" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;color:var(--on-surface-variant);padding:24px;text-align:center">
         <svg class="ic logo" style="width:54px;height:54px;color:var(--primary)" viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
         <h2 style="color:var(--on-surface);font-size:20px;font-weight:500">Kiffy Messenger</h2>
-        <p style="max-width:320px;font-size:13px">Минималистичный мессенджер без рекламы. Поддерживает PHP long-polling, WebSocket и локальный хост.</p>
+        <p style="max-width:320px;font-size:13px">Минималистичный мессенджер без рекламы. Поддерживает личные сообщения (ЛС), PHP long-polling, WebSocket и локальный хост.</p>
         <div style="display:flex;gap:8px;margin-top:6px">
           <button class="btn filled" id="btnConnectEmpty">Подключиться</button>
           <button class="btn tonal" id="btnHostTabEmpty">⚡ Мой хост</button>
@@ -422,10 +523,6 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
 
       <div class="composer hidden" id="composer">
         <div class="chip-bar">
-          <div class="pm-chip hidden" id="pmChip">
-            <span>ЛС: </span><b id="pmTarget"></b>
-            <button id="pmClose" style="cursor:pointer;margin-left:4px">✕</button>
-          </div>
           <div class="anchor-chip hidden" id="anchorChip">
             <span>⚓ Закреп: </span><b id="anchorTarget"></b>
             <button id="anchorClose" style="cursor:pointer;margin-left:4px">✕</button>
@@ -683,6 +780,32 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
 
 <div class="snack" id="snack"></div>
 
+<!-- ================= FLOATING PM NOTIFICATION ================= -->
+<div class="pm-notif-toast hidden" id="pmNotifToast">
+  <div id="pmNotifAvatar"></div>
+  <div class="pm-notif-body">
+    <div class="pm-notif-author" id="pmNotifAuthor">Alice</div>
+    <div class="pm-notif-snippet" id="pmNotifSnippet">Привет!</div>
+  </div>
+  <button class="btn tonal" id="btnPmNotifOpen" style="padding:4px 10px;font-size:12px">Открыть</button>
+  <button class="iconbtn" id="btnPmNotifDismiss" style="width:28px;height:28px;font-size:13px">✕</button>
+</div>
+
+<!-- ================= USER PROFILE SHEET / DIALOG ================= -->
+<div class="scrim" id="userProfileScrim">
+  <div class="dialog" style="max-width:320px;text-align:center">
+    <div id="upAvatarWrap" style="display:flex;justify-content:center;margin:6px 0 10px"></div>
+    <h2 id="upName" style="justify-content:center;font-size:18px">Alice</h2>
+    <div class="sub" id="upStatus" style="margin-bottom:14px">В сети • Участник</div>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-top:4px">
+      <button class="btn filled" id="btnUpSendPm">💬 Написать в ЛС</button>
+      <button class="btn tonal" id="btnUpAnchor">⚓ Закрепить быстрые сообщения</button>
+      <button class="btn outlined" id="btnUpCopy">📋 Скопировать имя</button>
+      <button class="btn text" id="btnUpClose">Закрыть</button>
+    </div>
+  </div>
+</div>
+
 <!-- ================= CORE CLIENT ================= -->
 <script>
 "use strict";
@@ -766,8 +889,12 @@ const S = {
   ws: null, connected: false, everConnected: false, reconnect: false,
   transport: "ws", apiBase: "", token: null, since: 0,
   server: "", user: "", psk: null, admin: false, anchor: null,
-  cipherKey: null, users: [], pmTarget: null, typingUsers: new Map(),
-  latencies: [], retry: 0, closedByUs: false
+  cipherKey: null, users: [], typingUsers: new Map(),
+  latencies: [], retry: 0, closedByUs: false,
+  
+  // Real Private Messaging Engine
+  conversations: new Map(), // key: 'public' or partnerName.toLowerCase()
+  activeChat: "public"      // 'public' or partnerName.toLowerCase()
 };
 
 const $ = id => document.getElementById(id);
@@ -1121,6 +1248,199 @@ function onDisconnected(){
   setTimeout(() => connect(S.server, S.user, S.psk, null).catch(()=>{}), delay);
 }
 
+/* ================= Real Private Messaging Engine ================= */
+function getConversation(id, type = (id === "public" ? "public" : "pm")) {
+  const key = (id || "public").toLowerCase();
+  let conv = S.conversations.get(key);
+  if (!conv) {
+    conv = {
+      id: key,
+      title: id === "public" ? "Общий чат" : id,
+      type: type,
+      partner: id === "public" ? null : id,
+      unread: 0,
+      lastMsg: null,
+      messages: []
+    };
+    S.conversations.set(key, conv);
+    renderChatTabs();
+  }
+  return conv;
+}
+
+function openChat(chatId) {
+  const norm = (chatId || "public").toLowerCase();
+  const conv = getConversation(norm);
+  S.activeChat = norm;
+  conv.unread = 0;
+
+  updateChatHeader();
+  renderChatTabs();
+  renderActiveMessages();
+
+  setView("chat");
+
+  if (inputEl) {
+    inputEl.placeholder = norm === "public"
+      ? "Сообщение в общий чат… (/help — команды)"
+      : `Личное сообщение для ${conv.title}…`;
+    inputEl.focus();
+  }
+}
+
+function closeChat(chatId) {
+  const norm = (chatId || "").toLowerCase();
+  if (norm && norm !== "public") {
+    S.conversations.delete(norm);
+    if (S.activeChat === norm) {
+      openChat("public");
+    } else {
+      renderChatTabs();
+    }
+  }
+}
+
+function updateChatHeader() {
+  const isPm = S.activeChat !== "public";
+  const pmHeader = $("pmHeaderBar");
+  if (!pmHeader) return;
+
+  if (isPm) {
+    const conv = getConversation(S.activeChat);
+    pmHeader.classList.remove("hidden");
+    const avatarWrap = $("pmHeaderAvatar");
+    avatarWrap.innerHTML = "";
+    avatarWrap.appendChild(avatarEl(conv.title, 32));
+    $("pmHeaderName").textContent = conv.title;
+
+    const isOnline = S.users.some(u => u.n.toLowerCase() === conv.title.toLowerCase());
+    const dot = $("pmHeaderDot");
+    const sub = $("pmHeaderSub");
+    if (isOnline) {
+      dot.className = "pm-online-dot";
+      sub.textContent = "В сети • Личные сообщения";
+    } else {
+      dot.className = "pm-online-dot offline";
+      sub.textContent = "Офлайн • Личные сообщения";
+    }
+  } else {
+    pmHeader.classList.add("hidden");
+  }
+}
+
+function renderChatTabs() {
+  const bar = $("chatTabsBar");
+  if (!bar) return;
+
+  if (!S.connected) {
+    bar.classList.add("hidden");
+    return;
+  }
+  bar.classList.remove("hidden");
+  bar.innerHTML = "";
+
+  // 1. Public chat tab
+  const pubConv = getConversation("public");
+  const pubTab = el("div", "chat-tab" + (S.activeChat === "public" ? " active" : ""));
+  pubTab.innerHTML = `<span># Общий чат</span>`;
+  if (pubConv.unread > 0) {
+    const unread = el("span", "tab-unread", pubConv.unread > 99 ? "99+" : String(pubConv.unread));
+    pubTab.appendChild(unread);
+  }
+  pubTab.onclick = () => openChat("public");
+  bar.appendChild(pubTab);
+
+  // 2. Open PM conversation tabs
+  for (const [key, conv] of S.conversations) {
+    if (key === "public") continue;
+    const tab = el("div", "chat-tab" + (S.activeChat === key ? " active" : ""));
+    const isOnline = S.users.some(u => u.n.toLowerCase() === conv.title.toLowerCase());
+
+    tab.innerHTML = `
+      <span class="pm-online-dot ${isOnline ? '' : 'offline'}"></span>
+      <span>${conv.title}</span>
+    `;
+    if (conv.unread > 0) {
+      const unread = el("span", "tab-unread", conv.unread > 99 ? "99+" : String(conv.unread));
+      tab.appendChild(unread);
+    }
+    const closeBtn = el("span", "tab-close", "✕");
+    closeBtn.title = "Закрыть вкладку ЛС";
+    closeBtn.onclick = (e) => {
+      e.stopPropagation();
+      closeChat(key);
+    };
+    tab.appendChild(closeBtn);
+
+    tab.onclick = () => openChat(key);
+    bar.appendChild(tab);
+  }
+}
+
+let _pmNotifTimer = null;
+function showPmNotification(from, text) {
+  const toast = $("pmNotifToast");
+  if (!toast) return;
+  const av = $("pmNotifAvatar");
+  av.innerHTML = "";
+  av.appendChild(avatarEl(from, 36));
+  $("pmNotifAuthor").textContent = `ЛС от ${from}`;
+  $("pmNotifSnippet").textContent = text;
+
+  $("btnPmNotifOpen").onclick = () => {
+    toast.classList.remove("show");
+    openChat(from);
+  };
+  $("btnPmNotifDismiss").onclick = () => {
+    toast.classList.remove("show");
+  };
+
+  toast.classList.add("show");
+  clearTimeout(_pmNotifTimer);
+  _pmNotifTimer = setTimeout(() => toast.classList.remove("show"), 6000);
+}
+
+function openUserProfile(name) {
+  if (!name || name === S.user) return;
+  const modal = $("userProfileScrim");
+  if (!modal) return;
+
+  const avWrap = $("upAvatarWrap");
+  avWrap.innerHTML = "";
+  avWrap.appendChild(avatarEl(name, 56));
+  $("upName").textContent = name;
+
+  const userObj = S.users.find(u => u.n.toLowerCase() === name.toLowerCase());
+  const isOnline = !!userObj;
+  const isAdmin = userObj && userObj.a;
+  $("upStatus").textContent = (isOnline ? "В сети" : "Офлайн") + (isAdmin ? " • Администратор" : " • Участник");
+
+  $("btnUpSendPm").onclick = () => {
+    modal.classList.remove("show");
+    openChat(name);
+  };
+
+  $("btnUpAnchor").onclick = () => {
+    modal.classList.remove("show");
+    S.anchor = name;
+    $("anchorTarget").textContent = name;
+    $("anchorChip").classList.remove("hidden");
+    rawSend({t: "anchor", to: name});
+    snack(`⚓ Сообщения закреплены за ${name}`);
+  };
+
+  $("btnUpCopy").onclick = () => {
+    modal.classList.remove("show");
+    if (navigator.clipboard) navigator.clipboard.writeText(name);
+    snack(`Скопировано: ${name}`);
+  };
+
+  $("btnUpClose").onclick = () => modal.classList.remove("show");
+  modal.onclick = (e) => { if (e.target === modal) modal.classList.remove("show"); };
+
+  modal.classList.add("show");
+}
+
 /* Protocol Handler */
 function handle(m){
   switch (m.t){
@@ -1135,30 +1455,85 @@ function handle(m){
       $("messages").classList.remove("hidden");
       $("composer").classList.remove("hidden");
       setUsers(m.users);
-      (m.history || []).forEach(render);
+
+      // Load server history into public chat
+      const pubConv = getConversation("public");
+      pubConv.messages = [];
+      (m.history || []).forEach(h => {
+        pubConv.messages.push(h);
+        pubConv.lastMsg = h;
+      });
+      renderActiveMessages();
+      renderChatTabs();
+      updateChatHeader();
+
       snack(`Вход выполнен: ${m.user}`);
       AudioEngine.vibrate(20);
       setView("chat");
       break;
-    case "msg":
+
+    case "msg": {
       if (S.transport === "poll" && m.from === S.user) break;
-      render(m);
+      const pub = getConversation("public");
+      pub.messages.push(m);
+      pub.lastMsg = m;
+      if (S.activeChat === "public") {
+        appendMessageBubble(m);
+      } else {
+        pub.unread++;
+        renderChatTabs();
+      }
       if (m.from !== S.user) {
         AudioEngine.play();
         AudioEngine.vibrate(25);
       }
       break;
-    case "pm":
-      render(m);
+    }
+
+    case "pm": {
+      // Direct message from someone to me
+      const partner = m.from;
+      const conv = getConversation(partner);
+      conv.messages.push(m);
+      conv.lastMsg = m;
       AudioEngine.play();
       AudioEngine.vibrate([25, 30]);
+
+      if (S.activeChat === partner.toLowerCase()) {
+        appendMessageBubble(m);
+      } else {
+        conv.unread++;
+        renderChatTabs();
+        showPmNotification(partner, m.text);
+      }
       break;
-    case "pm_sent": case "global": case "sys":
-      render(m);
+    }
+
+    case "pm_sent": {
+      // Outgoing message ack
+      const partner = m.to;
+      const conv = getConversation(partner);
+      const already = conv.messages.some(x => x.t === "pm_sent" && x.text === m.text && Math.abs((x.ts||0) - (m.ts||0)) < 4);
+      if (!already && m.text) {
+        conv.messages.push(m);
+        conv.lastMsg = m;
+        if (S.activeChat === partner.toLowerCase()) {
+          appendMessageBubble(m);
+        }
+      }
       break;
+    }
+
+    case "global": case "sys": {
+      const active = getConversation(S.activeChat);
+      active.messages.push(m);
+      appendMessageBubble(m);
+      break;
+    }
+
     case "error":
       if (S._loginRes){ S._loginRes(m); S._loginRes = null; }
-      render(m);
+      appendMessageBubble(m);
       snack("⚠ " + (m.msg || "Ошибка"));
       break;
     case "users":
@@ -1203,7 +1578,7 @@ function avatarEl(name, size = 32){
   a.textContent = (name || "?").slice(0, 2).toUpperCase();
   let h = 0;
   for (const c of (name || "")) h = (h * 31 + c.charCodeAt(0)) >>> 0;
-  const isDark = document.body.dataset.theme === "dark";
+  const isDark = (document.documentElement.dataset.theme || document.body.dataset.theme) === "dark";
   a.style.background = `hsl(${h % 360} 35% ${isDark ? 26 : 82}%)`;
   a.style.color = `hsl(${h % 360} 35% ${isDark ? 88 : 18}%)`;
   return a;
@@ -1212,39 +1587,80 @@ function avatarEl(name, size = 32){
 const fmtTs = ts => new Date((ts || Date.now()/1000) * 1000).toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"});
 function atBottom(){ return messagesEl.scrollHeight - messagesEl.scrollTop - messagesEl.clientHeight < 60; }
 
-function render(m){
+function renderActiveMessages() {
+  messagesEl.innerHTML = "";
+  const conv = getConversation(S.activeChat);
+
+  if (S.activeChat !== "public") {
+    // Beautiful PM intro banner
+    const card = el("div", "pm-intro-card");
+    card.appendChild(avatarEl(conv.title, 52));
+    card.appendChild(el("div", "pm-intro-title", `Личный диалог с ${conv.title}`));
+    card.appendChild(el("div", "pm-intro-text", "🔒 Это персональная переписка. Сообщения передаются напрямую и видны только вам и вашему собеседнику."));
+    messagesEl.appendChild(card);
+  }
+
+  conv.messages.forEach(m => appendMessageBubble(m, false));
+  messagesEl.scrollTop = messagesEl.scrollHeight;
+}
+
+function appendMessageBubble(m, autoScroll = true) {
   const d = document.createElement("div");
   const ts = el("span", "ts", fmtTs(m.ts));
 
-  if (m.t === "msg" || m.t === "pm" || m.t === "global"){
+  if (m.t === "msg" || m.t === "pm" || m.t === "pm_sent" || m.t === "global") {
     const own = m.from === S.user || m.t === "pm_sent";
-    d.className = "msg " + (m.t === "pm" ? "pm " : m.t === "global" ? "global " : "") + (own ? "own" : "other");
-    d.appendChild(avatarEl(m.from, 32));
+    const isPm = m.t === "pm" || m.t === "pm_sent";
+    d.className = "msg " + (isPm ? "pm " : m.t === "global" ? "global " : "") + (own ? "own" : "other");
+
+    const senderName = m.t === "pm_sent" ? S.user : m.from;
+    const av = avatarEl(senderName, 32);
+    if (!own) {
+      av.classList.add("msg-clickable");
+      av.title = "Профиль " + senderName;
+      av.onclick = () => openUserProfile(senderName);
+    }
+    d.appendChild(av);
 
     const b = el("div", "bubble");
     const meta = el("div", "meta");
-    const nm = el("span", "name", m.t === "pm_sent" ? ("Вы → " + m.to) : m.from);
-    meta.appendChild(nm);
+
+    const nameSpan = el("span", "name", own ? (m.t === "pm_sent" ? `Вы → ${m.to}` : "Вы") : senderName);
+    if (!own) {
+      nameSpan.classList.add("msg-clickable");
+      nameSpan.title = "Нажмите для профиля";
+      nameSpan.onclick = () => openUserProfile(senderName);
+    }
+    meta.appendChild(nameSpan);
+
+    if (isPm) {
+      const pmBadge = el("span", "pm-badge-chip", "ЛС");
+      meta.appendChild(pmBadge);
+    }
     meta.appendChild(ts);
 
     b.appendChild(meta);
     b.appendChild(el("div", "msg-text", m.text));
     d.appendChild(b);
-  } else if (m.t === "sys"){
+  } else if (m.t === "sys") {
     d.className = "msg sys";
     const b = el("div", "bubble", m.text + "  ");
     b.appendChild(ts);
     d.appendChild(b);
-  } else if (m.t === "error"){
+  } else if (m.t === "error") {
     d.className = "msg sys err";
     const b = el("div", "bubble", "⚠ " + (m.msg || ""));
     d.appendChild(b);
   } else return;
 
-  const stick = atBottom();
+  const stick = atBottom() || autoScroll;
   messagesEl.appendChild(d);
   while (messagesEl.children.length > 400) messagesEl.firstChild.remove();
   if (stick) messagesEl.scrollTop = messagesEl.scrollHeight;
+}
+
+function render(m){
+  appendMessageBubble(m, true);
 }
 
 function renderTyping(){
@@ -1263,27 +1679,39 @@ function renderUsers(){
   }
   for (const u of S.users){
     const row = el("div", "person");
-    row.appendChild(avatarEl(u.n, 36));
+    const av = avatarEl(u.n, 36);
+    av.style.cursor = "pointer";
+    av.onclick = () => openUserProfile(u.n);
+    row.appendChild(av);
+
     const info = el("div", "pinfo");
+    info.style.cursor = "pointer";
+    info.onclick = () => openUserProfile(u.n);
+
     const nm = el("div", "pname", u.n);
+    if (u.a) {
+      const star = el("span", "badge ok", "★ Admin");
+      star.style.fontSize = "9.5px"; star.style.padding = "1px 5px";
+      nm.appendChild(star);
+    }
     info.appendChild(nm);
-    info.appendChild(el("div", "psub", u.a ? "Администратор" : (u.n === S.user ? "Вы" : "Участник")));
+    info.appendChild(el("div", "psub", u.n === S.user ? "Вы" : "В сети"));
     row.appendChild(info);
 
     if (u.n !== S.user && S.connected){
-      const act = el("button", "btn text", "ЛС");
-      act.onclick = () => { startPm(u.n); setView("chat"); };
+      const act = el("button", "btn filled", "💬 Написать");
+      act.style.padding = "5px 12px"; act.style.fontSize = "12px";
+      act.onclick = () => openChat(u.n);
       row.appendChild(act);
     }
     list.appendChild(row);
   }
+  renderChatTabs();
+  updateChatHeader();
 }
 
 function startPm(name){
-  S.pmTarget = name;
-  $("pmTarget").textContent = name;
-  $("pmChip").classList.remove("hidden");
-  inputEl.focus();
+  openChat(name);
 }
 
 async function sendCurrent(){
@@ -1292,32 +1720,52 @@ async function sendCurrent(){
   inputEl.value = "";
   sendTyping(false);
 
+  // Slash commands
   if (text.startsWith("/")){
-    const cmd = text.split(/\s+/)[0].toLowerCase();
-    if (cmd === "/s"){
-      const rest = text.slice(3).trim();
-      const sp = rest.indexOf(" ");
-      if (sp > 0){
-        const to = rest.slice(0, sp), body = rest.slice(sp + 1);
-        await rawSend({t:"pm", to, text: body});
-        render({t:"pm_sent", to, text: body, ts: Math.floor(Date.now()/1000)});
+    const parts = text.split(/\s+/);
+    const cmd = parts[0].toLowerCase();
+    if (cmd === "/s" || cmd === "/pm"){
+      const to = parts[1];
+      const body = text.slice(parts[0].length + (to ? to.length : 0) + 2).trim();
+      if (to && body){
+        await rawSend({t: "pm", to: to, text: body});
+        const conv = getConversation(to);
+        const msgObj = {t: "pm_sent", from: S.user, to: to, text: body, ts: Math.floor(Date.now()/1000)};
+        conv.messages.push(msgObj);
+        conv.lastMsg = msgObj;
+        openChat(to);
         return;
       }
     } else if (cmd === "/exit"){
-      await rawSend({t:"exit"});
+      await rawSend({t: "exit"});
       S.closedByUs = true; S.connected = false;
       setStatus("off");
-      render({t:"sys", text: "— отключено —", ts: Math.floor(Date.now()/1000)});
+      const pub = getConversation("public");
+      pub.messages.push({t: "sys", text: "— отключено —", ts: Math.floor(Date.now()/1000)});
+      if (S.activeChat === "public") renderActiveMessages();
       return;
     }
   }
 
-  if (S.pmTarget){
-    await rawSend({t:"pm", to: S.pmTarget, text});
-    render({t:"pm_sent", to: S.pmTarget, text, ts: Math.floor(Date.now()/1000)});
+  if (S.activeChat !== "public"){
+    // We are inside a dedicated PM conversation!
+    const partner = getConversation(S.activeChat).title;
+    const msgObj = {t: "pm_sent", from: S.user, to: partner, text: text, ts: Math.floor(Date.now()/1000)};
+    const conv = getConversation(partner);
+    conv.messages.push(msgObj);
+    conv.lastMsg = msgObj;
+    appendMessageBubble(msgObj);
+    renderChatTabs();
+    await rawSend({t: "pm", to: partner, text: text});
   } else {
-    render({t:"msg", from: S.user, text, ts: Math.floor(Date.now()/1000)});
-    await rawSend({t:"msg", text});
+    // Public general chat
+    const msgObj = {t: "msg", from: S.user, text: text, ts: Math.floor(Date.now()/1000)};
+    const pub = getConversation("public");
+    pub.messages.push(msgObj);
+    pub.lastMsg = msgObj;
+    appendMessageBubble(msgObj);
+    renderChatTabs();
+    await rawSend({t: "msg", text: text});
   }
 }
 
@@ -1338,7 +1786,8 @@ inputEl.addEventListener("keydown", e => {
   }
 });
 $("btnSend").onclick = sendCurrent;
-$("pmClose").onclick = () => { S.pmTarget = null; $("pmChip").classList.add("hidden"); };
+$("btnPmBack").onclick = () => openChat("public");
+$("btnPmCloseThread").onclick = () => closeChat(S.activeChat);
 $("anchorClose").onclick = () => { S.anchor = null; $("anchorChip").classList.add("hidden"); rawSend({t:"unanchor"}); };
 
 /* Host Controller */
