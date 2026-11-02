@@ -588,7 +588,7 @@ class KiffyServer:
         except Exception:
             peer.send({"t": "error", "msg": f"User {target} is not reachable."})
             return
-        peer.send({"t": "pm_sent", "to": target})
+        peer.send({"t": "pm_sent", "to": target, "text": text, "ts": now()})
 
     def handle_command(self, peer, text):
         """Slash commands (keeps the terminal client dumb). Returns False on /exit."""
