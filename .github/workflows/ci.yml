@@ -1,0 +1,43 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  python:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: End-to-end protocol tests
+        run: python3 test_kiffy.py
+
+  rust:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: cargo test (crypto + json vectors)
+        working-directory: rust
+        run: cargo test --release
+      - name: selftest binary
+        working-directory: rust
+        run: |
+          cargo build --release
+          ./target/release/kiffy_server --selftest
+      - name: build without cargo (plain rustc)
+        working-directory: rust
+        run: ./build.sh && ./kiffy_server --selftest
+
+  php:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.1"
+      - name: Lint PHP backend
+        run: for f in php-server/*.php; do php -l "$f"; done

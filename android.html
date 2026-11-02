@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#006D3B">
+<title>Kiffy — Мобильная версия для Android</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23006D3B' d='M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z'/%3E%3C/svg%3E">
+<style>
+:root {
+  --primary: #006D3B; --on-primary: #FFFFFF;
+  --primary-container: #97F7B3; --on-primary-container: #00210C;
+  --secondary-container: #D1E8D6; --on-secondary-container: #0C1F14;
+  --surface: #10140F; --on-surface: #DFE4DB; --on-surface-variant: #C1C9BF;
+  --surface-c-low: #191D18; --surface-c: #1D211C; --surface-c-high: #272B26;
+  --outline: #8B938A; --shadow: rgba(0,0,0,.6);
+}
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+body {
+  font-family: Roboto, "Segoe UI", -apple-system, sans-serif;
+  background: var(--surface); color: var(--on-surface);
+  line-height: 1.5; padding: 20px 16px 40px; min-height: 100vh;
+}
+.container { max-width: 680px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px; }
+header { text-align: center; margin: 24px 0 12px; }
+h1 { font-size: 32px; font-weight: 700; color: #7ADB96; display: flex; align-items: center; justify-content: center; gap: 10px; }
+.sub { color: var(--on-surface-variant); font-size: 15px; margin-top: 6px; }
+
+.card {
+  background: var(--surface-c-low); border-radius: 24px; padding: 22px;
+  display: flex; flex-direction: column; gap: 12px; border: 1px solid var(--surface-c-high);
+}
+.card-title { font-size: 17px; font-weight: 600; display: flex; align-items: center; gap: 10px; color: #7ADB96; }
+.card p { font-size: 14px; color: var(--on-surface-variant); }
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 13px 22px; border-radius: 100px; font-weight: 600; font-size: 15px;
+  text-decoration: none; cursor: pointer; border: none; transition: transform .15s, filter .15s;
+}
+.btn.filled { background: #7ADB96; color: #003916; }
+.btn.filled:hover { filter: brightness(1.08); transform: scale(1.01); }
+.btn.tonal { background: var(--secondary-container); color: var(--on-secondary-container); }
+.btn.outlined { border: 1.5px solid var(--outline); color: var(--on-surface); }
+
+.features-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 4px 0; }
+@media (max-width: 500px) { .features-grid { grid-template-columns: 1fr; } }
+.feat {
+  background: var(--surface-c); padding: 12px 14px; border-radius: 16px;
+  display: flex; align-items: center; gap: 10px; font-size: 13.5px;
+}
+.feat .icon { font-size: 20px; }
+
+.code-box {
+  background: #000; color: #7ADB96; font-family: monospace; font-size: 12.5px;
+  padding: 12px 16px; border-radius: 14px; overflow-x: auto;
+}
+.badge { font-size: 11px; font-weight: 700; background: var(--primary-container); color: var(--on-primary-container); border-radius: 8px; padding: 2px 8px; }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <h1>⚡ Kiffy Mobile</h1>
+    <div class="sub">Material You (MD3) • Полная поддержка хоста • Вес &lt; 1 МБ</div>
+  </header>
+
+  <div class="card" style="text-align:center;align-items:center">
+    <div class="card-title">🚀 Запустить мобильную версию</div>
+    <p>Откройте нативное адаптивное приложение прямо в мобильном браузере или установите его на экран «Домой» (PWA):</p>
+    <a href="app.html" class="btn filled" style="width:100%;max-width:320px;margin-top:6px">
+      Открыть Kiffy App
+    </a>
+  </div>
+
+  <div class="card">
+    <div class="card-title">✨ Возможности мобильной версии</div>
+    <div class="features-grid">
+      <div class="feat"><span class="icon">⚡</span><div><b>Полный Хост</b><br><span style="font-size:12px;opacity:.7">Запуск сервера на телефоне</span></div></div>
+      <div class="feat"><span class="icon">🌐</span><div><b>Веб + Обычный</b><br><span style="font-size:12px;opacity:.7">WebSocket, TCP, PHP polling</span></div></div>
+      <div class="feat"><span class="icon">🎨</span><div><b>Material You</b><br><span style="font-size:12px;opacity:.7">7 Monet палитр + AMOLED</span></div></div>
+      <div class="feat"><span class="icon">💬</span><div><b>Сообщения</b><br><span style="font-size:12px;opacity:.7">Личные (PM), Anchor, Global</span></div></div>
+      <div class="feat"><span class="icon">🔊</span><div><b>Звук и вибро</b><br><span style="font-size:12px;opacity:.7">Material Sound синтез</span></div></div>
+      <div class="feat"><span class="icon">🪶</span><div><b>Вес &lt; 1 МБ</b><br><span style="font-size:12px;opacity:.7">В 50 раз меньше лимита</span></div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">📦 Скачать готовый мобильный пакет</div>
+    <p>Автономный архив для Android включает мобильный клиент, скрипт хоста и исходники Android Studio:</p>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <a href="kiffy-mobile.zip" class="btn tonal" download style="flex:1">
+        ⬇ Скачать kiffy-mobile.zip (65 КБ)
+      </a>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">📱 Как запустить Хост на телефоне</div>
+    <p><b>Вариант 1 (Быстрый):</b> В приложении перейдите на вкладку <b>«Хост»</b> и нажмите «Запустить сервер». Скопируйте ссылку и отправьте друзьям в одной Wi-Fi сети или при раздаче мобильной точки доступа.</p>
+    <p><b>Вариант 2 (Через Termux / Pydroid 3):</b></p>
+    <div class="code-box">python3 mobile_host.py</div>
+    <p style="font-size:12.5px;color:var(--on-surface-variant)">Сервер сразу покажет локальный IP и раздаст веб-чат, WebSocket и TCP-порт 8888 без единой внешней зависимости!</p>
+  </div>
+
+  <div style="text-align:center;font-size:13px;color:var(--on-surface-variant);margin-top:12px">
+    <a href="index.html" style="color:#7ADB96;text-decoration:none">← На главную Kiffy</a> | <a href="app.html" style="color:#7ADB96;text-decoration:none">Перейти в чат →</a>
+  </div>
+</div>
+
+</body>
+</html>

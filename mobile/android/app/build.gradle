@@ -1,0 +1,53 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'org.kiffy.messenger'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId "org.kiffy.messenger"
+        minSdk 24
+        targetSdk 34
+        versionCode 220
+        versionName "2.2.0"
+    }
+
+    signingConfigs {
+        release {
+            storeFile file('../../kiffy-release.jks')
+            storePassword 'kiffypass123'
+            keyAlias 'kiffy'
+            keyPassword 'kiffypass123'
+            v1SigningEnabled true
+            v2SigningEnabled true
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            signingConfig signingConfigs.release
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            signingConfig signingConfigs.release
+        }
+    }
+
+    lint {
+        checkReleaseBuilds false
+        abortOnError false
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
+
+dependencies {
+    implementation 'androidx.appcompat:appcompat:1.7.0'
+    implementation 'com.google.android.material:material:1.12.0'
+}

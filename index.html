@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#F7FBF2">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#10140F">
+<title>Kiffy — Freedom to Communicate</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23006D3B' d='M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z'/%3E%3C/svg%3E">
+<style>
+:root, :root[data-theme="light"] {
+  --primary:#006D3B; --on-primary:#fff; --primary-container:#97F7B3; --on-primary-container:#00210C;
+  --secondary:#4E6355; --secondary-container:#D1E8D6; --on-secondary-container:#0C1F14;
+  --surface:#F7FBF2; --on-surface:#191D18; --on-surface-variant:#414941;
+  --surface-c-low:#F1F5EC; --surface-c:#EBF0E7; --surface-c-high:#E5EAE1;
+  --outline-v:#C1C9BF; --shadow:rgba(0,0,0,.26);
+}
+:root[data-theme="dark"] {
+  --primary:#7ADB96; --on-primary:#003916; --primary-container:#005325; --on-primary-container:#97F7B3;
+  --secondary:#B5CCBA; --secondary-container:#384B3D; --on-secondary-container:#D1E8D6;
+  --surface:#10140F; --on-surface:#DFE4DB; --on-surface-variant:#C1C9BF;
+  --surface-c-low:#191D18; --surface-c:#1D211C; --surface-c-high:#272B26;
+  --outline-v:#414941; --shadow:rgba(0,0,0,.6);
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: Roboto, "Segoe UI", system-ui, sans-serif;
+  background: var(--surface); color: var(--on-surface);
+  min-height: 100vh; display: flex; flex-direction: column; align-items: center;
+  padding: clamp(20px, 6vw, 64px);
+}
+.hero { text-align: center; margin: 8vh 0 6vh; max-width: 640px; }
+.hero .logo { color: var(--primary); }
+.hero h1 { font-size: clamp(52px, 12vw, 96px); font-weight: 500; letter-spacing: -0.02em; }
+.hero p { color: var(--on-surface-variant); font-size: clamp(16px, 2.5vw, 20px); margin-top: 10px; }
+.open {
+  margin-top: 34px; display: inline-flex; align-items: center; gap: 10px;
+  background: var(--primary); color: var(--on-primary); text-decoration: none;
+  font-size: 16px; font-weight: 500; padding: 15px 30px; border-radius: 100px;
+  box-shadow: 0 2px 8px var(--shadow); transition: filter .2s, transform .2s;
+}
+.open:hover { filter: brightness(1.08); }
+.open:active { transform: scale(.97); }
+.open svg { width: 20px; height: 20px; fill: currentColor; }
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px;
+  width: min(920px, 100%); }
+.card {
+  background: var(--surface-c-low); border-radius: 20px; padding: 22px;
+  display: flex; flex-direction: column; gap: 8px; text-decoration: none; color: inherit;
+  transition: background .2s, transform .2s;
+}
+.card:hover { background: var(--surface-c-high); }
+.card:active { transform: scale(.98); }
+.card .ic { width: 26px; height: 26px; fill: var(--primary); }
+.card b { font-size: 16px; font-weight: 500; }
+.card span { font-size: 13px; color: var(--on-surface-variant); }
+footer { margin-top: 8vh; color: var(--on-surface-variant); font-size: 12.5px; text-align: center; }
+footer code { background: var(--surface-c); padding: 2px 8px; border-radius: 6px; }
+</style>
+</head>
+<body>
+  <div class="hero">
+    <svg class="ic logo" style="width:56px;height:56px" viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
+    <h1>Kiffy</h1>
+    <p>Freedom to Communicate — без рекламы, без слежки, ваш сервер.</p>
+    <a class="open" href="app.html">
+      <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
+      Открыть веб-приложение
+    </a>
+  </div>
+
+  <div class="cards">
+    <a class="card" href="windows.zip" download>
+      <svg class="ic" viewBox="0 0 24 24"><path d="M3 5.5 10.5 4.4v7.1H3zM11.5 4.2 21 3v8.5h-9.5zM3 12.5h7.5v7.1L3 18.5zM11.5 12.5H21V21l-9.5-1.3z"/></svg>
+      <b>Windows</b><span>Готовая сборка клиента</span>
+    </a>
+    <a class="card" href="kiffy_server.py" download>
+      <svg class="ic" viewBox="0 0 24 24"><path d="M20 13H4c-.55 0-1 .45-1 1v6c0 .55.45 1 1 1h16c.55 0 1-.45 1-1v-6c0-.55-.45-1-1-1zM7 19c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zM20 3H4c-.55 0-1 .45-1 1v6c0 .55.45 1 1 1h16c.55 0 1-.45 1-1V4c0-.55-.45-1-1-1zM7 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/></svg>
+      <b>Linux / сервер</b><span>python3 kiffy_server.py — без зависимостей</span>
+    </a>
+    <a class="card" href="kiffy_client.py" download>
+      <svg class="ic" viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6zm8 5H6v-2h8z"/></svg>
+      <b>Терминал</b><span>Тот же протокол, CLL-клиент</span>
+    </a>
+    <a class="card" href="kiffy-mobile.zip" download>
+      <svg class="ic" viewBox="0 0 24 24"><path d="M17 1.01L7 1c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-1.99-2-1.99zM17 19H7V5h10v14z"/></svg>
+      <b>Android / Мобильный</b><span>kiffy-mobile.zip (&lt; 1 МБ, MD3 + Хост)</span>
+    </a>
+    <a class="card" href="android.html">
+      <svg class="ic" viewBox="0 0 24 24"><path d="M17.6 9.48c-.3-.3-.8-.3-1.1 0-.3.3-.3.8 0 1.1.3.3.8.3 1.1 0 .3-.3.3-.8 0-1.1zm1.7-2.9c-.3-.3-.8-.3-1.1 0-.3.3-.3.8 0 1.1.3.3.8.3 1.1 0 .3-.3.3-.8 0-1.1zm-10.6 0c-.3-.3-.8-.3-1.1 0-.3.3-.3.8 0 1.1.3.3.8.3 1.1 0 .3-.3.3-.8 0-1.1zm1.7 2.9c-.3-.3-.8-.3-1.1 0-.3.3-.3.8 0 1.1.3.3.8.3 1.1 0 .3-.3.3-.8 0-1.1zM12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8 0-4.41 3.59-8 8-8s8 3.59 8 8-3.59 8-8 8z"/></svg>
+      <b>Мобильный портал</b><span>Инструкции, PWA, запуск хоста</span>
+    </a>
+    <a class="card" href="https://github.com/kazitu-off/kiffy" target="_blank" rel="noopener">
+      <svg class="ic" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+      <b>GitHub</b><span>Исходный код и issues</span>
+    </a>
+    <a class="card" href="https://github.com/kazitu-off/kiffy" target="_blank" rel="noopener">
+      <svg class="ic" viewBox="0 0 24 24"><path d="M11 15h2v2h-2zm0-8h2v6h-2zm1-5C6.47 2 2 6.5 2 12s4.47 10 10 10c5.53 0 10-4.5 10-10S17.53 2 12 2z"/></svg>
+      <b>PHP-хостинг</b><span>См. php-server/ — работает на shared-хостинге</span>
+    </a>
+  </div>
+
+  <footer>
+    Простой. Честный. Без рекламы.<br>
+    <code>python3 kiffy_server.py</code> — сервер на одном порту: чат + веб + WebSocket
+  </footer>
+</body>
+</html>

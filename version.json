@@ -1,0 +1,24 @@
+{
+  "version": "2.2.0",
+  "name": "Kiffy Mobile Edition (Material You)",
+  "release_date": "2026-11-02",
+  "min_app_version": "2.0.0",
+  "download_url": "https://github.com/kazitu-off/kiffy",
+  "features": {
+    "host_mode": true,
+    "web_connection": true,
+    "regular_server": true,
+    "md3_material_you": true,
+    "sound_haptics": true,
+    "in_app_updates": true
+  },
+  "changelog": [
+    "✨ Полная поддержка хоста на мобильных: запуск сервера, управление участниками, бан/звёзды, автоопределение IP",
+    "🌐 Подключение к Вебу (WebSocket wss://, PHP long-polling) и Обычному серверу (TCP/WS порт 8888)",
+    "💬 Сообщения: личные сообщения (PM), фиксация (Anchor), глобальные оповещения (/global), живой статус набора",
+    "🎨 Полная кастомизация Material You (MD3): 7 Monet-палитр, AMOLED Pure Black, выбор своего цвета, радиус пузырей",
+    "🔊 Синтез звуков Material Sound (Web Audio) и виброотклик (Haptic Feedback) без внешних файлов",
+    "🔄 Встроенный экран обновлений с проверкой версий в реальном времени",
+    "🪶 Ультралегкий вес: менее 1 МБ (значительно меньше лимита 50 МБ)"
+  ]
+}

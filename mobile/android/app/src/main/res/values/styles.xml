@@ -1,0 +1,7 @@
+<resources>
+    <style name="Theme.Kiffy" parent="android:Theme.Material.NoActionBar">
+        <item name="android:statusBarColor">#10140F</item>
+        <item name="android:navigationBarColor">#1D211C</item>
+        <item name="android:windowBackground">#10140F</item>
+    </style>
+</resources>

@@ -1,0 +1,14 @@
+[package]
+name = "kiffy_server"
+version = "2.0.0"
+edition = "2021"
+description = "Kiffy v2 messenger server — one port for TCP chat, HTTP and WebSocket; std only"
+license = "MIT"
+
+[[bin]]
+name = "kiffy_server"
+path = "src/main.rs"
+
+[profile.release]
+opt-level = 3
+lto = true
