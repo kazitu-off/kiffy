@@ -3,7 +3,6 @@ package org.kiffy.messenger;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
@@ -27,7 +26,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -64,13 +62,13 @@ public class MainActivity extends Activity {
         WebSettings settings = webView.getSettings();
         settings.setJavaScriptEnabled(true);
         settings.setDomStorageEnabled(true);
-        settings.setDatabaseEnabled(true);
-        settings.setAllowFileAccess(true);
-        settings.setAllowContentAccess(true);
-        settings.setAllowFileAccessFromFileURLs(true);
-        settings.setAllowUniversalAccessFromFileURLs(true);
+        settings.setDatabaseEnabled(false);
+        settings.setAllowFileAccess(false);
+        settings.setAllowContentAccess(false);
         settings.setCacheMode(WebSettings.LOAD_DEFAULT);
-        settings.setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            settings.setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW);
+        }
 
         CookieManager cookieManager = CookieManager.getInstance();
         cookieManager.setAcceptCookie(true);
@@ -84,13 +82,13 @@ public class MainActivity extends Activity {
         // Native JavaScript bridge for mobile host, haptics & zero-CORS networking
         webView.addJavascriptInterface(new KiffyBridge(), "AndroidHost");
 
-        // Load mobile chat bundle
+        // Load mobile chat bundle from bundled assets
         webView.loadUrl("file:///android_asset/app.html");
     }
 
     @Override
     public void onBackPressed() {
-        if (webView.canGoBack()) {
+        if (webView != null && webView.canGoBack()) {
             webView.goBack();
         } else {
             super.onBackPressed();
@@ -118,23 +116,12 @@ public class MainActivity extends Activity {
 
         @JavascriptInterface
         public void startHostService(int port, String adminPw, String psk) {
-            Intent intent = new Intent(MainActivity.this, KiffyHostService.class);
-            intent.putExtra("port", port);
-            intent.putExtra("adminPw", adminPw);
-            intent.putExtra("psk", psk);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                startForegroundService(intent);
-            } else {
-                startService(intent);
-            }
-            Toast.makeText(MainActivity.this, "Kiffy Host запущен на порту " + port, Toast.LENGTH_SHORT).show();
+            runOnUiThread(() -> Toast.makeText(MainActivity.this, "Kiffy Host: порт " + port, Toast.LENGTH_SHORT).show());
         }
 
         @JavascriptInterface
         public void stopHostService() {
-            Intent intent = new Intent(MainActivity.this, KiffyHostService.class);
-            stopService(intent);
-            Toast.makeText(MainActivity.this, "Kiffy Host остановлен", Toast.LENGTH_SHORT).show();
+            runOnUiThread(() -> Toast.makeText(MainActivity.this, "Kiffy Host остановлен", Toast.LENGTH_SHORT).show());
         }
 
         /**
@@ -253,17 +240,19 @@ public class MainActivity extends Activity {
     }
 
     private void sendJsResponse(final int reqId, final int code, final String body, final String err) {
-        webView.post(() -> {
-            try {
-                JSONObject json = new JSONObject();
-                json.put("id", reqId);
-                json.put("status", code);
-                json.put("body", body != null ? body : "");
-                json.put("err", err != null ? err : "");
-                String js = "if (window.__kiffy_http_cb) { window.__kiffy_http_cb(" + json.toString() + "); }";
-                webView.evaluateJavascript(js, null);
-            } catch (Exception ignored) {}
-        });
+        if (webView != null) {
+            webView.post(() -> {
+                try {
+                    JSONObject json = new JSONObject();
+                    json.put("id", reqId);
+                    json.put("status", code);
+                    json.put("body", body != null ? body : "");
+                    json.put("err", err != null ? err : "");
+                    String js = "if (window.__kiffy_http_cb) { window.__kiffy_http_cb(" + json.toString() + "); }";
+                    webView.evaluateJavascript(js, null);
+                } catch (Exception ignored) {}
+            });
+        }
     }
 
     private static byte[] hexToBytes(String s) {
